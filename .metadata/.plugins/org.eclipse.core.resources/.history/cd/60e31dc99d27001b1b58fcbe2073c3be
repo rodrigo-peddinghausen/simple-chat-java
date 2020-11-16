@@ -1,0 +1,12 @@
+package tarefa;
+
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+public class TesteCliente {
+
+	public static void main(String[] args) throws UnknownHostException, IOException {
+		new TelaLogin();
+
+	}
+}

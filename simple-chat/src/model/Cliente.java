@@ -1,0 +1,126 @@
+package model;
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
+import java.awt.Color;
+
+public class Cliente extends JFrame {
+
+	String host;
+	int door;
+	
+	Socket client = null;
+	PrintStream ps = null;
+
+	
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField textField;
+	private JTextArea textArea;
+	private JButton btnEnviar;
+
+	public Cliente(String host, int door) throws UnknownHostException, IOException {
+
+		this.host = host;
+		this.door = door;
+		
+		Handler ouvinte = new Handler();
+		
+		setTitle("Cliente");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		textArea = new JTextArea();
+		textArea.setBackground(Color.WHITE);
+		textArea.setEditable(false);
+		textArea.setBounds(6, 6, 438, 224);
+		contentPane.add(textArea);
+
+		textField = new JTextField();
+		textField.setBackground(Color.WHITE);
+		textField.setBounds(6, 234, 335, 38);
+		contentPane.add(textField);
+		textField.setColumns(10);
+		textField.addKeyListener(ouvinte);
+		
+		btnEnviar = new JButton("ENVIAR");
+		btnEnviar.setBackground(new Color(100, 149, 237));
+		btnEnviar.setFont(new Font("SansSerif", Font.BOLD, 13));
+		btnEnviar.setBounds(343, 234, 101, 38);
+		contentPane.add(btnEnviar);
+		btnEnviar.addActionListener(ouvinte);
+		btnEnviar.addKeyListener(ouvinte);
+		
+		setLocationRelativeTo(null);
+		setVisible(true);
+		run();
+	}
+
+	public void run() throws UnknownHostException, IOException {
+		this.client = new Socket(this.host, this.door);
+		this.ps = new PrintStream(this.client.getOutputStream());
+	}
+	
+	
+	
+	public class Handler implements ActionListener, KeyListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == btnEnviar) {
+				String msg = textField.getText();
+				textArea.append(msg + "\n");
+				textField.setText("");
+
+				Scanner sc = new Scanner(msg);
+				
+				while(sc.hasNextLine()) {
+					ps.println(sc.nextLine());
+				}
+				
+				sc.close();	
+			}
+
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+				btnEnviar.doClick();
+			}
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {			
+		}
+		@Override
+		public void keyReleased(KeyEvent e) {
+		}
+
+	
+
+	}
+
+}
